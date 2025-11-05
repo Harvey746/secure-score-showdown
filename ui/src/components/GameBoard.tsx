@@ -3,12 +3,22 @@ import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { GameState } from '../hooks/useGameContract';
 
+/**
+ * Props for the GameBoard component
+ * @interface GameBoardProps
+ */
 interface GameBoardProps {
+  /** Current state of the encrypted memory match game */
   gameState: GameState;
+  /** Callback function when a card is flipped */
   onCardFlip: (cardIndex: number) => void;
+  /** Callback function to resolve a potential match */
   onResolveMatch: () => void;
+  /** Callback function to start a new game */
   onStartNewGame: () => void;
+  /** Loading state indicator */
   isLoading: boolean;
+  /** Indicates if there's a pending match resolution */
   pendingResolution: boolean;
 }
 
