@@ -11,19 +11,22 @@ contract EncryptedMemoryMatch is SepoliaConfig {
     uint8 constant PAIRS_COUNT = 5; // 5 pairs
     uint8 constant MAX_STEPS = 50;
 
-    // Game session structure with FHE input verification
+    /**
+     * @dev Game session structure with FHE input verification
+     * Manages the complete state of an encrypted memory match game
+     */
     struct GameSession {
-        address player;
-        uint32 sessionId;
-        uint8[BOARD_SIZE] board; // Plain card values (0-4 for pairs) - cards are stored in plain text but user inputs are verified with FHE
-        uint8 flippedCard1; // Index of first flipped card (255 if not flipped)
-        uint8 flippedCard2; // Index of second flipped card (255 if not flipped)
-        uint8 steps; // Current step count
-        uint32 score; // Current score
-        uint8 matchedPairs; // Number of matched pairs
-        bool gameEnded;
-        uint256 startTime;
-        uint256 endTime;
+        address player;           // Player's wallet address
+        uint32 sessionId;         // Unique session identifier
+        uint8[BOARD_SIZE] board;  // Plain card values (0-4 for pairs) - cards stored in plain text but user inputs verified with FHE
+        uint8 flippedCard1;       // Index of first flipped card (255 if not flipped)
+        uint8 flippedCard2;       // Index of second flipped card (255 if not flipped)
+        uint8 steps;              // Current step count (limited by MAX_STEPS)
+        uint32 score;             // Current score based on efficiency and speed
+        uint8 matchedPairs;       // Number of successfully matched pairs (0-5)
+        bool gameEnded;           // Flag indicating if the game has concluded
+        uint256 startTime;        // Game session start timestamp
+        uint256 endTime;          // Game session end timestamp
     }
 
     // Player stats structure
