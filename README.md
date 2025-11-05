@@ -8,12 +8,21 @@ A privacy-preserving memory card matching game built with FHEVM (Fully Homomorph
 
 [![Game Demo](./encrypted-memory-match.mp4)](./encrypted-memory-match.mp4)
 
+## 🛠️ Tech Stack
+
+![Solidity](https://img.shields.io/badge/Solidity-363636?style=for-the-badge&logo=solidity&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Hardhat](https://img.shields.io/badge/Hardhat-FFDB1E?style=for-the-badge&logo=ethereum&logoColor=black)
+![FHEVM](https://img.shields.io/badge/FHEVM-Zama-FF6B35?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDJDMTMuMSAyIDE0IDIuOSAxNCA0VjE4QzE0IDIxLjMgMTEuMyAyNCA4IDI0QzQuNyAyNCAyIDIxLjMgMiAxOFYyQzIgMi45IDMuMSAyIDQgMkg4QzguOSAyIDggMi45IDggNFYxNkM4IDE3LjEgOC45IDE4IDEwIDE4QzExLjEgMTggMTIgMTcuMSAxMiAxNlY0QzEyIDIuOSAxMi45IDIgMTQgMloiIGZpbGw9IiNGRjZCMzUiLz4KPC9zdmc+)
+
 ## 🎯 Features
 
 - **Privacy-First Gaming**: Built with FHE technology for secure game data handling
-- **Secure Score Calculation**: Privacy-preserving score computation
-- **Global Leaderboard**: Compete with players worldwide
-- **Rainbow Wallet Integration**: Seamless wallet connection
+- **Secure Score Calculation**: Privacy-preserving score computation using homomorphic encryption
+- **Global Leaderboard**: Compete with players worldwide with verifiable rankings
+- **Rainbow Wallet Integration**: Seamless wallet connection with multi-chain support
 - **Responsive UI**: Modern, cyber-themed interface built with React and Tailwind CSS
 - **Game Abandon Feature**: Players can abandon games without affecting their statistics
 
