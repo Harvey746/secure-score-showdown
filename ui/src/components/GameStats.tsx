@@ -3,9 +3,16 @@ import { Button } from './ui/button';
 import { GameState } from '../hooks/useGameContract';
 import { Clock, Target, Trophy, Zap, X } from 'lucide-react';
 
+/**
+ * Props for the GameStats component
+ * @interface GameStatsProps
+ */
 interface GameStatsProps {
+  /** Current game state containing all game statistics */
   gameState: GameState;
+  /** Callback function to abandon the current game */
   onAbandonGame: () => void;
+  /** Loading state indicator for UI interactions */
   isLoading: boolean;
 }
 
