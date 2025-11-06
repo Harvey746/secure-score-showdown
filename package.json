@@ -6,12 +6,16 @@
   "scripts": {
     "test": "hardhat test",
     "test:sepolia": "hardhat test --network sepolia",
+    "test:all": "npm run test && npm run test:sepolia",
     "compile": "hardhat compile",
     "deploy:localhost": "hardhat deploy",
     "deploy:sepolia": "hardhat deploy --network sepolia",
     "node": "hardhat node",
+    "clean": "hardhat clean && rm -rf typechain-types",
     "frontend:dev": "cd ui && npm run dev",
-    "frontend:build": "cd ui && npm run build"
+    "frontend:build": "cd ui && npm run build",
+    "frontend:install": "cd ui && npm install",
+    "build:all": "npm run compile && npm run frontend:build"
   },
   "devDependencies": {
     "@fhevm/hardhat-plugin": "^0.1.0",
