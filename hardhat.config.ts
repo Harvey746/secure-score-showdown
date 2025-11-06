@@ -6,9 +6,10 @@ const config: HardhatUserConfig = {
   solidity: {
     version: "0.8.24",
     settings: {
+      // Gas optimization settings for FHEVM contract deployment
       optimizer: {
         enabled: true,
-        runs: 200,
+        runs: 200, // Optimized for frequent contract calls in gaming scenarios
       },
     },
   },
