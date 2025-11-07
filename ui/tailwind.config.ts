@@ -52,9 +52,10 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Custom glow colors for cyber-themed UI elements
         glow: {
-          primary: "#00e5ff",
-          secondary: "#0066ff",
+          primary: "#00e5ff",   // Electric cyan for primary highlights
+          secondary: "#0066ff", // Deep blue for secondary accents
         },
       },
       borderRadius: {
