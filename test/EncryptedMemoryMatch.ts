@@ -3,6 +3,10 @@ import { ethers } from "hardhat";
 import { EncryptedMemoryMatch, EncryptedMemoryMatch__factory } from "../types";
 import { expect } from "chai";
 
+/**
+ * Test suite for EncryptedMemoryMatch contract
+ * Tests FHE-enabled memory matching game functionality
+ */
 type Signers = {
   deployer: HardhatEthersSigner;
   alice: HardhatEthersSigner;
