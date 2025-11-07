@@ -2,7 +2,10 @@ import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 import { sepolia } from 'wagmi/chains';
 import { defineChain } from 'viem';
 
-// Define localhost chain with correct configuration
+/**
+ * Custom localhost chain configuration for FHEVM development
+ * Enables local testing of encrypted memory match contracts
+ */
 const localhostChain = defineChain({
   id: 31337,
   name: 'Localhost',
