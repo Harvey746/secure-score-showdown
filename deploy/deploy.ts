@@ -1,6 +1,10 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 
+/**
+ * Deployment script for EncryptedMemoryMatch contract
+ * Deploys the FHE-enabled memory matching game to specified network
+ */
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre;
   const { deploy } = deployments;
