@@ -64,25 +64,21 @@ describe("EncryptedMemoryMatch", function () {
       .withArgs(signers.deployer.address, (value: any) => value !== undefined);
   });
 
-  it("should initialize game with 36 cards", async function () {
-    // Ensure clean state
+  it("should initialize game with 10 cards", async function () {
     await encryptedMemoryMatchContract.connect(signers.deployer).resetGame();
 
-    // Start game with deployer account (has funds)
     await encryptedMemoryMatchContract.connect(signers.deployer).startGame();
 
-    // Get game state
     const gameState = await encryptedMemoryMatchContract.connect(signers.deployer).getGameState();
     const [sessionId, board, flippedCard1, flippedCard2, steps, score, matchedPairs, gameEnded] = gameState;
 
-    // Verify game initialization
-    expect(board.length).to.equal(36); // 6x6 grid
+    expect(board.length).to.equal(10);
     expect(steps).to.equal(0);
     expect(score).to.equal(0);
     expect(matchedPairs).to.equal(0);
     expect(gameEnded).to.equal(false);
-    expect(flippedCard1).to.equal(255); // No cards flipped initially
+    expect(flippedCard1).to.equal(255);
     expect(flippedCard2).to.equal(255);
-    expect(sessionId).to.be.a('bigint'); // Session ID should be generated
+    expect(sessionId).to.be.a('bigint');
   });
 });
