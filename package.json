@@ -1,0 +1,34 @@
+{
+  "name": "encrypted-memory-match",
+  "version": "1.0.0",
+  "description": "Encrypted Memory Card Matching Game using FHEVM",
+  "main": "index.js",
+  "scripts": {
+    "test": "hardhat test",
+    "test:sepolia": "hardhat test --network sepolia",
+    "compile": "hardhat compile",
+    "deploy:localhost": "hardhat deploy",
+    "deploy:sepolia": "hardhat deploy --network sepolia",
+    "node": "hardhat node",
+    "frontend:dev": "cd ui && npm run dev",
+    "frontend:build": "cd ui && npm run build"
+  },
+  "devDependencies": {
+    "@fhevm/hardhat-plugin": "^0.1.0",
+    "@nomicfoundation/hardhat-ethers": "^3.0.5",
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@types/chai": "^4.3.11",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.10.5",
+    "chai": "^4.3.10",
+    "ethers": "^6.9.0",
+    "hardhat": "^2.19.2",
+    "hardhat-deploy": "^0.11.45",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@fhevm/solidity": "^0.8.0",
+    "@zama-fhe/oracle-solidity": "^0.1.0"
+  }
+}
