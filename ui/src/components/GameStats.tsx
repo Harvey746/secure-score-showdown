@@ -146,7 +146,6 @@ export const GameStats = ({ gameState, onAbandonGame, isLoading }: GameStatsProp
         </CardContent>
       </Card>
 
-      {/* Abandon Game Button */}
       {!gameState.gameEnded && (
         <Card className="bg-slate-800/50 border-slate-700">
           <CardContent className="pt-6">
