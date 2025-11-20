@@ -155,6 +155,17 @@ contract EncryptedMemoryMatch is SepoliaConfig {
         GameSession storage game = activeGames[msg.sender];
         require(game.flippedCard1 != 255 && game.flippedCard2 != 255, "No cards to resolve");
 
+        uint8 card1Value = game.board[game.flippedCard1];
+        uint8 card2Value = game.board[game.flippedCard2];
+
+        if (card1Value == card2Value) {
+            game.matchedPairs += 1;
+
+            if (game.matchedPairs >= PAIRS_COUNT) {
+                _endGame(true);
+            }
+        }
+
         game.flippedCard1 = 255;
         game.flippedCard2 = 255;
 
