@@ -81,4 +81,24 @@ describe("EncryptedMemoryMatch", function () {
     expect(flippedCard2).to.equal(255);
     expect(sessionId).to.be.a('bigint');
   });
+
+  it("should allow abandoning game without affecting stats", async function () {
+    await encryptedMemoryMatchContract.connect(signers.alice).resetGame();
+    await encryptedMemoryMatchContract.connect(signers.alice).startGame();
+
+    const statsBefore = await encryptedMemoryMatchContract.connect(signers.alice).getPlayerStats();
+    const gamesPlayedBefore = statsBefore[1];
+
+    await expect(encryptedMemoryMatchContract.connect(signers.alice).abandonGame())
+      .to.emit(encryptedMemoryMatchContract, "GameEnded")
+      .withArgs(signers.alice.address, false, 0);
+
+    const gameState = await encryptedMemoryMatchContract.connect(signers.alice).getGameState();
+    const [, , , , , , , gameEnded] = gameState;
+    expect(gameEnded).to.equal(true);
+
+    const statsAfter = await encryptedMemoryMatchContract.connect(signers.alice).getPlayerStats();
+    const gamesPlayedAfter = statsAfter[1];
+    expect(gamesPlayedAfter).to.equal(gamesPlayedBefore);
+  });
 });
