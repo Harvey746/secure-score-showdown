@@ -36,6 +36,7 @@ export const GameBoard = ({ gameState, onCardFlip, onResolveMatch, onStartNewGam
   useEffect(() => {
     setCardStates(prevStates => {
       const newStates = [...prevStates];
+
       newStates.forEach((state, index) => {
         if (!matchedCards.has(index)) {
           newStates[index] = {
@@ -44,9 +45,23 @@ export const GameBoard = ({ gameState, onCardFlip, onResolveMatch, onStartNewGam
           };
         }
       });
+
+      if (gameState.flippedCard1 !== 255 && gameState.flippedCard1 < newStates.length && !matchedCards.has(gameState.flippedCard1)) {
+        newStates[gameState.flippedCard1].isFlipped = true;
+      }
+      if (gameState.flippedCard2 !== 255 && gameState.flippedCard2 < newStates.length && !matchedCards.has(gameState.flippedCard2)) {
+        newStates[gameState.flippedCard2].isFlipped = true;
+      }
+
+      matchedCards.forEach(cardIndex => {
+        if (cardIndex < newStates.length) {
+          newStates[cardIndex].isFlipped = true;
+        }
+      });
+
       return newStates;
     });
-  }, [gameState.sessionId]);
+  }, [gameState.flippedCard1, gameState.flippedCard2, gameState.sessionId, matchedCards]);
 
   // Handle card resolution after both cards are flipped
   useEffect(() => {
