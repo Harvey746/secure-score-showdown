@@ -26,6 +26,20 @@ export async function loadOrSign(
       }
     }
 
+    const publicKey = await getPublicKey(contractAddress, signer);
+    const signature = await getPublicKeySignature(contractAddress, signer);
+
+    if (publicKey && signature) {
+      const decryptionSignature: FhevmDecryptionSignature = {
+        publicKey,
+        signature
+      };
+
+      localStorage.setItem(storageKey, JSON.stringify(decryptionSignature));
+
+      return decryptionSignature;
+    }
+
     return null;
   } catch (error) {
     console.error('Failed to load or sign FHE decryption signature:', error);
