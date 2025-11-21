@@ -106,7 +106,21 @@ export const useLeaderboard = () => {
       refreshLeaderboard();
       refreshPlayerRank();
     }
-  }, [isConnected, chain]);
+  }, [isConnected, chain, refreshLeaderboard, refreshPlayerRank]);
+
+  useEffect(() => {
+    if (!publicClient || !isConnected) return;
+
+    const contract = getContract();
+    if (!contract) return;
+
+    const interval = setInterval(() => {
+      refreshLeaderboard();
+      refreshPlayerRank();
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [publicClient, isConnected, getContract, refreshLeaderboard, refreshPlayerRank]);
 
   return {
     leaderboard,
