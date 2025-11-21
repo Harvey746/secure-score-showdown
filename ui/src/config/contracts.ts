@@ -4,12 +4,22 @@ export const CONTRACT_ADDRESSES = {
 };
 
 export function getContractAddress(chainId: number): string {
-  if (chainId === 31337) {
-    return CONTRACT_ADDRESSES.localhost;
-  } else if (chainId === 11155111) {
-    return CONTRACT_ADDRESSES.sepolia;
+  try {
+    if (chainId === 31337) {
+      return CONTRACT_ADDRESSES.localhost;
+    } else if (chainId === 11155111) {
+      if (!CONTRACT_ADDRESSES.sepolia) {
+        throw new Error('Sepolia contract address not configured. Please set VITE_CONTRACT_ADDRESS_SEPOLIA in your .env file.');
+      }
+      return CONTRACT_ADDRESSES.sepolia;
+    }
+    throw new Error(`Unsupported chain ID: ${chainId}. Please switch to localhost (31337) or Sepolia (11155111).`);
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error('Failed to get contract address');
   }
-  return '';
 }
 
 export const CONTRACT_ABI = [
