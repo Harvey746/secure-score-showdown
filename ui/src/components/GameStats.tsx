@@ -146,6 +146,41 @@ export const GameStats = ({ gameState, onAbandonGame, isLoading }: GameStatsProp
         </CardContent>
       </Card>
 
+      {gameState.gameEnded && (
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg text-white flex items-center gap-2">
+              <Trophy className="h-5 w-5 text-yellow-400" />
+              Final Results
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-300">Final Score:</span>
+                <span className="text-2xl font-bold text-yellow-400">
+                  {(gameState.score / 1000000).toFixed(2)}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-300">Result:</span>
+                <span className={`font-semibold ${
+                  gameState.matchedPairs >= maxPairs ? 'text-green-400' : 'text-red-400'
+                }`}>
+                  {gameState.matchedPairs >= maxPairs ? 'Victory!' : 'Game Over'}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-300">Pairs Matched:</span>
+                <span className="text-cyan-400 font-semibold">
+                  {gameState.matchedPairs}/{maxPairs}
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {!gameState.gameEnded && (
         <Card className="bg-slate-800/50 border-slate-700">
           <CardContent className="pt-6">
