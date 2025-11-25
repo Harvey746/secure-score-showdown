@@ -1,4 +1,4 @@
-// No React import needed for this component
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Trophy, Gamepad2, Brain, Shield } from 'lucide-react';
 import { GameBoard } from '../components/GameBoard';
@@ -10,12 +10,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 
 const GamePage = () => {
   const { gameState, startGame, flipCard, resolveMatch, abandonGame, isLoading, error, pendingResolution } = useGameContract();
+  const [isStarting, setIsStarting] = useState(false);
 
   const handleStartGame = async () => {
+    setIsStarting(true);
     try {
       await startGame();
     } catch (err) {
       console.error('Failed to start game:', err);
+    } finally {
+      setIsStarting(false);
     }
   };
 
@@ -86,10 +90,10 @@ const GamePage = () => {
                 </p>
                 <Button
                   onClick={handleStartGame}
-                  disabled={isLoading}
+                  disabled={isLoading || isStarting}
                   className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-semibold py-3 px-8 rounded-lg"
                 >
-                  {isLoading ? 'Starting Game...' : 'Start New Game'}
+                  {isLoading || isStarting ? 'Starting Game...' : 'Start New Game'}
                 </Button>
               </CardContent>
             </Card>
