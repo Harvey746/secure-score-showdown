@@ -52,6 +52,11 @@ export const useGameContract = () => {
         account: address,
       }) as unknown as any[];
 
+      if (!result || result.length === 0) {
+        setGameState(null);
+        return;
+      }
+
       if (!result || !Array.isArray(result) || result.length < 10) {
         console.log('Invalid game state result:', result);
         setGameState(null);
