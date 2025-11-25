@@ -90,16 +90,14 @@ export const useGameContract = () => {
         endTime: Number(endTime || 0),
       };
 
-      console.log('Setting game state:', gameStateData);
       setGameState(gameStateData);
     } catch (err: any) {
-      // Silently handle "No active game" errors - this is expected when user hasn't started a game
       if (err?.message?.includes('No active game')) {
-        console.log('No active game - setting state to null');
         setGameState(null);
         return;
       }
-      console.error('Failed to get game state:', err);
+      const errorMessage = err?.message || 'Failed to get game state';
+      setError(errorMessage);
       setGameState(null);
     }
   }, [address, publicClient, getContract]);
