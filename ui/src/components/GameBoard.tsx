@@ -66,10 +66,12 @@ export const GameBoard = ({ gameState, onCardFlip, onResolveMatch, onStartNewGam
   // Handle card resolution after both cards are flipped
   useEffect(() => {
     if (gameState.flippedCard1 !== 255 && gameState.flippedCard2 !== 255 && !localPendingResolution) {
-      // Two cards are flipped, start resolution process
+      if (gameState.flippedCard1 >= gameState.board.length || gameState.flippedCard2 >= gameState.board.length) {
+        return;
+      }
+
       setLocalPendingResolution(true);
 
-      // Check if they match by comparing values
       const card1Value = gameState.board[gameState.flippedCard1];
       const card2Value = gameState.board[gameState.flippedCard2];
       const isMatch = card1Value === card2Value;
