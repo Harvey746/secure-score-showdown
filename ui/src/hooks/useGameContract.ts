@@ -320,10 +320,13 @@ export const useGameContract = () => {
     }
   }, [address, walletClient, publicClient, getContract, refreshGameState]);
 
-  // Refresh game state when address or chain changes
   useEffect(() => {
     if (isConnected && address) {
       refreshGameState();
+      const interval = setInterval(() => {
+        refreshGameState();
+      }, 5000);
+      return () => clearInterval(interval);
     } else {
       setGameState(null);
     }
