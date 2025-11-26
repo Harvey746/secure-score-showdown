@@ -247,12 +247,14 @@ export const useGameContract = () => {
       });
 
       const hash = await walletClient.writeContract(flipResult.request);
-      await publicClient.waitForTransactionReceipt({ hash });
+      const receipt = await publicClient.waitForTransactionReceipt({ hash });
 
-      // Refresh game state
-      await refreshGameState();
+      if (receipt.status === 'success') {
+        await refreshGameState();
+      } else {
+        throw new Error('Transaction failed');
+      }
     } catch (err: any) {
-      console.error('Failed to flip card:', err);
       setError(err.message || 'Failed to flip card');
     } finally {
       setIsLoading(false);
