@@ -1,4 +1,5 @@
-import { getPublicKey, getPublicKeySignature } from '@fhevmjs/sdk';
+// FHEVM SDK import - commented out until package is available
+// import { getPublicKey, getPublicKeySignature } from '@fhevmjs/sdk';
 import { ethers } from 'ethers';
 
 export interface FhevmDecryptionSignature {
@@ -7,7 +8,7 @@ export interface FhevmDecryptionSignature {
 }
 
 export async function loadOrSign(
-  provider: ethers.Provider,
+  _provider: ethers.Provider,
   signer: ethers.Signer,
   contractAddress: string
 ): Promise<FhevmDecryptionSignature | null> {
@@ -26,19 +27,24 @@ export async function loadOrSign(
       }
     }
 
-    const publicKey = await getPublicKey(contractAddress, signer);
-    const signature = await getPublicKeySignature(contractAddress, signer);
-
-    if (publicKey && signature) {
-      const decryptionSignature: FhevmDecryptionSignature = {
-        publicKey,
-        signature
-      };
-
-      localStorage.setItem(storageKey, JSON.stringify(decryptionSignature));
-
-      return decryptionSignature;
-    }
+    // FHEVM SDK functions - commented out until package is available
+    // const publicKey = await getPublicKey(contractAddress, signer);
+    // const signature = await getPublicKeySignature(contractAddress, signer);
+    
+    // Placeholder implementation - return null for now
+    // TODO: Implement FHEVM integration when SDK is available
+    console.warn('FHEVM SDK not available - returning null');
+    
+    // if (publicKey && signature) {
+    //   const decryptionSignature: FhevmDecryptionSignature = {
+    //     publicKey,
+    //     signature
+    //   };
+    //
+    //   localStorage.setItem(storageKey, JSON.stringify(decryptionSignature));
+    //
+    //   return decryptionSignature;
+    // }
 
     return null;
   } catch (error) {

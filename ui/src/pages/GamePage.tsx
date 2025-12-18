@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy, Gamepad2, Brain, Shield } from 'lucide-react';
+import { Trophy, Gamepad2, Shield } from 'lucide-react';
 import { GameBoard } from '../components/GameBoard';
 import { GameStats } from '../components/GameStats';
 import { Header } from '../components/Header';

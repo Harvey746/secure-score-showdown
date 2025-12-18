@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAccount, usePublicClient, useWalletClient } from 'wagmi';
-import { loadOrSign, saveDecryptionSignature, FhevmDecryptionSignature } from './FhevmDecryptionSignature';
+import { loadOrSign, FhevmDecryptionSignature } from './FhevmDecryptionSignature';
 import { ethers } from 'ethers';
 
 export interface FhevmState {

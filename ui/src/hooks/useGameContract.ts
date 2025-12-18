@@ -24,7 +24,6 @@ export const useGameContract = () => {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [lastRefreshTime, setLastRefreshTime] = useState<number>(0);
 
   const contractAddress = chain?.id === 31337
     ? CONTRACT_ADDRESSES.localhost
@@ -91,7 +90,6 @@ export const useGameContract = () => {
       };
 
       setGameState(gameStateData);
-      setLastRefreshTime(Date.now());
     } catch (err: any) {
       if (err?.message?.includes('No active game')) {
         setGameState(null);
