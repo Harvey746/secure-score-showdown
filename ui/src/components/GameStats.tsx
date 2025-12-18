@@ -1,7 +1,8 @@
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { GameState } from '../hooks/useGameContract';
-import { Clock, Target, Trophy, Zap, X } from 'lucide-react';
+import { Clock, Target, Trophy, X } from 'lucide-react';
 
 interface GameStatsProps {
   gameState: GameState;
@@ -14,14 +15,32 @@ export const GameStats = ({ gameState, onAbandonGame, isLoading }: GameStatsProp
   const maxSteps = 50; // Adjusted for 5 pairs
   const progressPercentage = (gameState.matchedPairs / maxPairs) * 100;
   const stepsRemaining = Math.max(0, maxSteps - gameState.steps);
+  const [currentTime, setCurrentTime] = useState(Math.floor(Date.now() / 1000));
+
+  // Update current time every second
+  useEffect(() => {
+    if (gameState.startTime > 0 && !gameState.gameEnded) {
+      const interval = setInterval(() => {
+        setCurrentTime(Math.floor(Date.now() / 1000));
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [gameState.startTime, gameState.gameEnded]);
+
+  // Format time in MM:SS format
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Game Progress */}
-      <Card className="bg-slate-800/50 border-slate-700">
+      <Card className="bg-gradient-to-br from-red-900/70 to-green-900/70 border-yellow-500/50 shadow-lg">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg text-white flex items-center gap-2">
-            <Target className="h-5 w-5 text-cyan-400" />
+            <Target className="h-5 w-5 text-red-400" />
             Game Progress
           </CardTitle>
         </CardHeader>
@@ -29,13 +48,13 @@ export const GameStats = ({ gameState, onAbandonGame, isLoading }: GameStatsProp
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-gray-300">Pairs Found</span>
-              <span className="text-cyan-400 font-semibold">
+              <span className="text-green-400 font-semibold">
                 {gameState.matchedPairs}/{maxPairs}
               </span>
             </div>
             <div className="w-full bg-slate-700 rounded-full h-2">
               <div
-                className="bg-gradient-to-r from-cyan-500 to-blue-600 h-2 rounded-full transition-all duration-300"
+                className="bg-gradient-to-r from-red-500 to-green-500 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${progressPercentage}%` }}
               />
             </div>
@@ -59,7 +78,7 @@ export const GameStats = ({ gameState, onAbandonGame, isLoading }: GameStatsProp
       </Card>
 
       {/* Current Score */}
-      <Card className="bg-slate-800/50 border-slate-700">
+      <Card className="bg-gradient-to-br from-red-900/70 to-green-900/70 border-yellow-500/50 shadow-lg">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg text-white flex items-center gap-2">
             <Trophy className="h-5 w-5 text-yellow-400" />
@@ -68,10 +87,10 @@ export const GameStats = ({ gameState, onAbandonGame, isLoading }: GameStatsProp
         </CardHeader>
         <CardContent>
           <div className="text-center">
-            <div className="text-3xl font-bold text-yellow-400 mb-1">
-              {gameState.score.toFixed(2)}
+            <div className="text-3xl font-bold text-yellow-400 mb-2">
+              {(gameState.score / 1000000).toFixed(2)}
             </div>
-            <div className="text-sm text-gray-400">
+            <div className="text-xs text-gray-400">
               Base: 10.00 + Step Bonus
             </div>
           </div>
@@ -79,10 +98,10 @@ export const GameStats = ({ gameState, onAbandonGame, isLoading }: GameStatsProp
       </Card>
 
       {/* Game Time */}
-      <Card className="bg-slate-800/50 border-slate-700">
+      <Card className="bg-gradient-to-br from-red-900/70 to-green-900/70 border-yellow-500/50 shadow-lg">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg text-white flex items-center gap-2">
-            <Clock className="h-5 w-5 text-blue-400" />
+            <Clock className="h-5 w-5 text-yellow-400" />
             Game Time
           </CardTitle>
         </CardHeader>
@@ -90,64 +109,27 @@ export const GameStats = ({ gameState, onAbandonGame, isLoading }: GameStatsProp
           <div className="text-center">
             {gameState.endTime > 0 ? (
               <div>
-                <div className="text-2xl font-bold text-blue-400 mb-1">
-                  {Math.floor((gameState.endTime - gameState.startTime) / 60)}:
-                  {((gameState.endTime - gameState.startTime) % 60).toString().padStart(2, '0')}
+                <div className="text-2xl font-bold text-yellow-400 mb-1">
+                  {formatTime(gameState.endTime - gameState.startTime)}
                 </div>
-                <div className="text-sm text-gray-400">Game Duration</div>
+                <div className="text-xs text-gray-400">Game Duration</div>
               </div>
             ) : gameState.startTime > 0 ? (
               <div>
-                <div className="text-2xl font-bold text-blue-400 mb-1">
-                  {Math.floor((Date.now() / 1000 - gameState.startTime) / 60)}:
-                  {((Date.now() / 1000 - gameState.startTime) % 60).toString().padStart(2, '0')}
+                <div className="text-2xl font-bold text-yellow-400 mb-1">
+                  {formatTime(currentTime - gameState.startTime)}
                 </div>
-                <div className="text-sm text-gray-400">Elapsed Time</div>
+                <div className="text-xs text-gray-400">Elapsed Time</div>
               </div>
             ) : (
-              <div className="text-gray-400">Not started</div>
+              <div className="text-gray-400 text-sm">Not started</div>
             )}
           </div>
         </CardContent>
       </Card>
 
-      {/* Game Status */}
-      <Card className="bg-slate-800/50 border-slate-700">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg text-white flex items-center gap-2">
-            <Zap className="h-5 w-5 text-orange-400" />
-            Game Status
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-300">Status:</span>
-              <span className={`font-semibold ${
-                gameState.gameEnded
-                  ? gameState.matchedPairs >= maxPairs
-                    ? 'text-green-400'
-                    : 'text-red-400'
-                  : 'text-blue-400'
-              }`}>
-                {gameState.gameEnded
-                  ? (gameState.matchedPairs >= maxPairs ? 'Won!' : 'Lost')
-                  : 'In Progress'
-                }
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-300">Session ID:</span>
-              <span className="text-cyan-400 font-mono text-sm">
-                {gameState.sessionId.toString().slice(0, 8)}...
-              </span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
       {gameState.gameEnded && (
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-gradient-to-br from-red-900/70 to-green-900/70 border-yellow-500/50 shadow-lg">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg text-white flex items-center gap-2">
               <Trophy className="h-5 w-5 text-yellow-400" />
@@ -182,7 +164,7 @@ export const GameStats = ({ gameState, onAbandonGame, isLoading }: GameStatsProp
       )}
 
       {!gameState.gameEnded && (
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-gradient-to-br from-red-900/70 to-green-900/70 border-yellow-500/50 shadow-lg">
           <CardContent className="pt-6">
             <Button
               onClick={onAbandonGame}

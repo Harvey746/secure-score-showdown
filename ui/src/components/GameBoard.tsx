@@ -22,6 +22,7 @@ export const GameBoard = ({ gameState, onCardFlip, onResolveMatch, onStartNewGam
   const [animatingCards, setAnimatingCards] = useState<Set<number>>(new Set());
   const [localPendingResolution, setLocalPendingResolution] = useState(false);
   const [matchedCards, setMatchedCards] = useState<Set<number>>(new Set());
+  const [resolvingPair, setResolvingPair] = useState<string | null>(null);
 
   // Initialize card states
   useEffect(() => {
@@ -31,6 +32,8 @@ export const GameBoard = ({ gameState, onCardFlip, onResolveMatch, onStartNewGam
     }));
     setCardStates(initialStates);
     setMatchedCards(new Set()); // Reset matched cards for new game
+    setLocalPendingResolution(false); // Reset pending resolution
+    setResolvingPair(null); // Reset resolving pair
   }, [gameState.sessionId]); // Reset when new game starts
 
   useEffect(() => {
@@ -65,27 +68,49 @@ export const GameBoard = ({ gameState, onCardFlip, onResolveMatch, onStartNewGam
 
   // Handle card resolution after both cards are flipped
   useEffect(() => {
-    if (gameState.flippedCard1 !== 255 && gameState.flippedCard2 !== 255 && !localPendingResolution) {
+    // Only process if both cards are flipped and we're not already resolving
+    if (gameState.flippedCard1 !== 255 && gameState.flippedCard2 !== 255 && !localPendingResolution && !isLoading) {
+      // Validate card indices
       if (gameState.flippedCard1 >= gameState.board.length || gameState.flippedCard2 >= gameState.board.length) {
         return;
       }
 
+      // Don't process if cards are already matched
+      if (matchedCards.has(gameState.flippedCard1) || matchedCards.has(gameState.flippedCard2)) {
+        return;
+      }
+
+      // Create a unique key for this card pair to avoid duplicate processing
+      const pairKey = `${Math.min(gameState.flippedCard1, gameState.flippedCard2)}-${Math.max(gameState.flippedCard1, gameState.flippedCard2)}`;
+      if (resolvingPair === pairKey) {
+        return; // Already processing this pair
+      }
+
       setLocalPendingResolution(true);
+      setResolvingPair(pairKey);
 
       const card1Value = gameState.board[gameState.flippedCard1];
       const card2Value = gameState.board[gameState.flippedCard2];
       const isMatch = card1Value === card2Value;
+      const flippedCard1Index = gameState.flippedCard1;
+      const flippedCard2Index = gameState.flippedCard2;
 
       const resolveCards = async () => {
         try {
           // If cards match, add them to matched cards before resolving
-          if (card1Value === card2Value) {
-            setMatchedCards(prev => new Set([...prev, gameState.flippedCard1, gameState.flippedCard2]));
+          if (isMatch) {
+            setMatchedCards(prev => new Set([...prev, flippedCard1Index, flippedCard2Index]));
           }
 
           await onResolveMatch();
+        } catch (error) {
+          console.error('Error resolving match:', error);
         } finally {
-          setLocalPendingResolution(false);
+          // Reset pending resolution after a delay to allow state to update
+          setTimeout(() => {
+            setLocalPendingResolution(false);
+            setResolvingPair(null);
+          }, 500);
         }
       };
 
@@ -99,7 +124,7 @@ export const GameBoard = ({ gameState, onCardFlip, onResolveMatch, onStartNewGam
         return () => clearTimeout(timer);
       }
     }
-  }, [gameState.flippedCard1, gameState.flippedCard2, gameState.board, onResolveMatch]);
+  }, [gameState.flippedCard1, gameState.flippedCard2, gameState.board, gameState.sessionId, onResolveMatch, isLoading]);
 
   const handleCardClick = async (cardIndex: number) => {
     if (isLoading || gameState.gameEnded || pendingResolution || localPendingResolution) return;
@@ -142,30 +167,23 @@ export const GameBoard = ({ gameState, onCardFlip, onResolveMatch, onStartNewGam
   }
 
   return (
-    <Card className="p-6 bg-slate-800/50 border-slate-700">
-      <div className="mb-4 text-center">
-        <h2 className="text-2xl font-bold text-white mb-2">Memory Match Game</h2>
-        <p className="text-gray-300">
-          Find all 5 pairs to win!
-        </p>
-      </div>
-
-      <div className="grid grid-cols-5 gap-3 max-w-xl mx-auto">
+    <Card className="p-6 bg-gradient-to-br from-red-900/60 to-green-900/60 border-yellow-500/50 shadow-lg glow-christmas">
+      <div className="grid grid-cols-5 gap-4 justify-items-center mx-auto w-fit">
         {cardStates.map((card, index) => (
           <Button
             key={index}
             onClick={() => handleCardClick(index)}
             disabled={isLoading || gameState.gameEnded || matchedCards.has(index)}
             className={`
-              h-16 w-16 p-0 text-2xl font-bold transition-all duration-300 transform
+              h-20 w-20 p-0 text-3xl font-bold transition-all duration-300 transform
               ${matchedCards.has(index)
-                ? 'bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-lg scale-105 ring-2 ring-green-400'
+                ? 'bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/50 scale-105 ring-2 ring-green-400'
                 : card.isFlipped
-                ? 'bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-lg scale-105'
-                : 'bg-gradient-to-br from-slate-600 to-slate-700 text-slate-400 hover:from-slate-500 hover:to-slate-600 hover:scale-105'
+                ? 'bg-gradient-to-br from-red-500 to-yellow-500 text-white shadow-lg shadow-red-500/50 scale-105'
+                : 'bg-gradient-to-br from-slate-700 to-slate-800 text-slate-300 hover:from-red-900 hover:to-green-900 hover:scale-105 hover:shadow-lg'
               }
               ${animatingCards.has(index) ? 'animate-pulse' : ''}
-              ${isLoading || matchedCards.has(index) ? 'opacity-50 cursor-not-allowed' : ''}
+              ${isLoading || matchedCards.has(index) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
             `}
           >
             {card.isFlipped ? getCardSymbol(card.value) : '?'}
@@ -186,9 +204,9 @@ export const GameBoard = ({ gameState, onCardFlip, onResolveMatch, onStartNewGam
           <Button
             onClick={onStartNewGame}
             disabled={isLoading}
-            className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-semibold py-3 px-8 rounded-lg"
+            className="bg-gradient-to-r from-red-600 to-green-600 hover:from-red-700 hover:to-green-700 text-white font-semibold py-3 px-8 rounded-lg shadow-lg"
           >
-            {isLoading ? 'Starting...' : 'Play Again'}
+            {isLoading ? 'Starting...' : '🎮 Play Again'}
           </Button>
         </div>
       )}

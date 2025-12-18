@@ -268,6 +268,9 @@ export const useGameContract = () => {
       return;
     }
 
+    setIsLoading(true);
+    setError(null);
+
     try {
       const contract = getContract();
       if (!contract) throw new Error('Contract not available');
@@ -282,11 +285,16 @@ export const useGameContract = () => {
       const hash = await walletClient.writeContract(resolveResult.request);
       await publicClient.waitForTransactionReceipt({ hash });
 
+      // Small delay to ensure contract state is updated
+      await new Promise(resolve => setTimeout(resolve, 100));
+
       // Refresh game state after resolution
       await refreshGameState();
     } catch (err: any) {
       console.error('Failed to resolve match:', err);
       setError(err.message || 'Failed to resolve match');
+    } finally {
+      setIsLoading(false);
     }
   }, [address, walletClient, publicClient, getContract, refreshGameState]);
 

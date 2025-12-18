@@ -83,6 +83,45 @@
   .bg-gradient-cyber {
     background: linear-gradient(135deg, #00e5ff 0%, #0066ff 100%);
   }
+
+  /* Christmas theme utilities */
+  .bg-gradient-christmas {
+    background: linear-gradient(135deg, #0d2818 0%, #1a472a 25%, #8b0000 50%, #b22222 75%, #daa520 100%);
+  }
+
+  .glow-christmas {
+    box-shadow: 0 0 20px rgba(220, 20, 60, 0.4), 0 0 40px rgba(34, 139, 34, 0.3);
+  }
+
+  .snowflake {
+    position: absolute;
+    color: white;
+    font-size: 1em;
+    animation: snowfall linear infinite;
+    opacity: 0.7;
+  }
+
+  @keyframes snowfall {
+    0% {
+      transform: translateY(-100vh) rotate(0deg);
+    }
+    100% {
+      transform: translateY(100vh) rotate(360deg);
+    }
+  }
+
+  .twinkle {
+    animation: twinkle 2s ease-in-out infinite;
+  }
+
+  @keyframes twinkle {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.3;
+    }
+  }
 }
 
 
