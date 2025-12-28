@@ -114,6 +114,9 @@ contract EncryptedMemoryMatch is SepoliaConfig {
 
         GameSession storage game = activeGames[msg.sender];
 
+        // Prevent flipping the same card twice
+        require(cardIndex != game.flippedCard1 && cardIndex != game.flippedCard2, "Card already flipped");
+
         // Get the plain card value (cards are stored in plain text)
         uint8 cardValue = game.board[cardIndex];
 
@@ -144,8 +147,8 @@ contract EncryptedMemoryMatch is SepoliaConfig {
             return;
         }
 
-        // Invalid state
-        revert("Invalid game state");
+        // Invalid state - both cards are already flipped, must resolve first
+        revert("Invalid game state: both cards already flipped");
     }
 
     function resolveMatch() external {

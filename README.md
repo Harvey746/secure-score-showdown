@@ -4,9 +4,9 @@ A privacy-preserving memory card matching game built with FHEVM (Fully Homomorph
 
 ## 🚀 Live Demo
 
-**🎮 Play Now**: [https://encrypted-memory-match-xpia.vercel.app/](https://encrypted-memory-match-xpia.vercel.app/)
+**🎮 Play Now**: [https://encrypted-memory-match-pro.vercel.app/](https://encrypted-memory-match-pro.vercel.app/)
 
-[![Game Demo](https://github.com/your-username/encrypted-memory-match/raw/main/encrypted-memory-match.mp4)](https://github.com/your-username/encrypted-memory-match/raw/main/encrypted-memory-match.mp4)
+**[Watch Demo Video](https://youtu.be/Vj2kjrkt4Qw)** - See the game in action!
 
 ## 🎯 Features
 
@@ -328,7 +328,7 @@ encrypted-memory-match/
 - 🔄 Requires FHEVM Sepolia configuration
 
 ### Vercel Deployment
-- ✅ **Live Demo**: [https://encrypted-memory-match-xpia.vercel.app/](https://encrypted-memory-match-xpia.vercel.app/)
+- ✅ **Live Demo**: [https://encrypted-memory-match-pro.vercel.app/](https://encrypted-memory-match-pro.vercel.app/)
 - ✅ TypeScript compilation successful
 - ✅ Automated deployment from GitHub
 

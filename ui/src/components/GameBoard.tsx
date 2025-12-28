@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { GameState } from '../hooks/useGameContract';
@@ -23,6 +23,8 @@ export const GameBoard = ({ gameState, onCardFlip, onResolveMatch, onStartNewGam
   const [localPendingResolution, setLocalPendingResolution] = useState(false);
   const [matchedCards, setMatchedCards] = useState<Set<number>>(new Set());
   const [resolvingPair, setResolvingPair] = useState<string | null>(null);
+  const resolutionTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const isResolvingRef = useRef(false);
 
   // Initialize card states
   useEffect(() => {
@@ -34,7 +36,27 @@ export const GameBoard = ({ gameState, onCardFlip, onResolveMatch, onStartNewGam
     setMatchedCards(new Set()); // Reset matched cards for new game
     setLocalPendingResolution(false); // Reset pending resolution
     setResolvingPair(null); // Reset resolving pair
+    isResolvingRef.current = false; // Reset resolving ref
+    if (resolutionTimerRef.current) {
+      clearTimeout(resolutionTimerRef.current);
+      resolutionTimerRef.current = null;
+    }
   }, [gameState.sessionId]); // Reset when new game starts
+
+  // Reset resolving state when cards are reset (after resolution)
+  useEffect(() => {
+    // If both cards are reset to 255, clear the resolving state
+    if (gameState.flippedCard1 === 255 && gameState.flippedCard2 === 255 && (localPendingResolution || resolvingPair !== null || isResolvingRef.current)) {
+      console.log('Cards reset, clearing resolving state');
+      isResolvingRef.current = false;
+      setLocalPendingResolution(false);
+      setResolvingPair(null);
+      if (resolutionTimerRef.current) {
+        clearTimeout(resolutionTimerRef.current);
+        resolutionTimerRef.current = null;
+      }
+    }
+  }, [gameState.flippedCard1, gameState.flippedCard2, localPendingResolution, resolvingPair]);
 
   useEffect(() => {
     setCardStates(prevStates => {
@@ -69,23 +91,44 @@ export const GameBoard = ({ gameState, onCardFlip, onResolveMatch, onStartNewGam
   // Handle card resolution after both cards are flipped
   useEffect(() => {
     // Only process if both cards are flipped and we're not already resolving
-    if (gameState.flippedCard1 !== 255 && gameState.flippedCard2 !== 255 && !localPendingResolution && !isLoading) {
+    if (gameState.flippedCard1 !== 255 && gameState.flippedCard2 !== 255 && !isResolvingRef.current) {
+      console.log('Card resolution check:', {
+        flippedCard1: gameState.flippedCard1,
+        flippedCard2: gameState.flippedCard2,
+        localPendingResolution,
+        isLoading,
+        boardLength: gameState.board.length,
+        resolvingPair,
+        isResolvingRef: isResolvingRef.current
+      });
+
       // Validate card indices
       if (gameState.flippedCard1 >= gameState.board.length || gameState.flippedCard2 >= gameState.board.length) {
+        console.warn('Invalid card indices:', gameState.flippedCard1, gameState.flippedCard2);
         return;
       }
 
       // Don't process if cards are already matched
       if (matchedCards.has(gameState.flippedCard1) || matchedCards.has(gameState.flippedCard2)) {
+        console.log('Cards already matched, skipping');
+        return;
+      }
+
+      // Don't process if either card is the same as previously flipped (waiting for resolution)
+      if (gameState.flippedCard1 === gameState.flippedCard2) {
+        console.warn('Same card flipped twice');
         return;
       }
 
       // Create a unique key for this card pair to avoid duplicate processing
       const pairKey = `${Math.min(gameState.flippedCard1, gameState.flippedCard2)}-${Math.max(gameState.flippedCard1, gameState.flippedCard2)}`;
-      if (resolvingPair === pairKey) {
+      if (resolvingPair === pairKey && isResolvingRef.current) {
+        console.log('Already processing this pair:', pairKey);
         return; // Already processing this pair
       }
 
+      console.log('Starting resolution for pair:', pairKey);
+      isResolvingRef.current = true;
       setLocalPendingResolution(true);
       setResolvingPair(pairKey);
 
@@ -95,49 +138,80 @@ export const GameBoard = ({ gameState, onCardFlip, onResolveMatch, onStartNewGam
       const flippedCard1Index = gameState.flippedCard1;
       const flippedCard2Index = gameState.flippedCard2;
 
+      console.log('Card values:', { card1Value, card2Value, isMatch });
+
       const resolveCards = async () => {
         try {
-          // If cards match, add them to matched cards before resolving
+          console.log('Calling onResolveMatch...');
+          await onResolveMatch();
+          console.log('onResolveMatch completed');
+          
+          // If cards match, add them to matched cards after resolving
           if (isMatch) {
+            console.log('Cards matched, adding to matchedCards');
             setMatchedCards(prev => new Set([...prev, flippedCard1Index, flippedCard2Index]));
           }
-
-          await onResolveMatch();
         } catch (error) {
           console.error('Error resolving match:', error);
+          // Reset on error so user can try again
+          isResolvingRef.current = false;
+          setLocalPendingResolution(false);
+          setResolvingPair(null);
         } finally {
           // Reset pending resolution after a delay to allow state to update
           setTimeout(() => {
+            console.log('Resetting pending resolution state');
+            isResolvingRef.current = false;
             setLocalPendingResolution(false);
             setResolvingPair(null);
-          }, 500);
+          }, 800);
         }
       };
 
       if (isMatch) {
         // Cards match - resolve after brief delay to show the match
-        const timer = setTimeout(resolveCards, 500);
-        return () => clearTimeout(timer);
+        console.log('Cards match, scheduling resolution in 500ms');
+        resolutionTimerRef.current = setTimeout(resolveCards, 500);
       } else {
         // Cards don't match - wait 1 second then resolve
-        const timer = setTimeout(resolveCards, 1000);
-        return () => clearTimeout(timer);
+        console.log('Cards don\'t match, scheduling resolution in 1000ms');
+        resolutionTimerRef.current = setTimeout(resolveCards, 1000);
       }
     }
-  }, [gameState.flippedCard1, gameState.flippedCard2, gameState.board, gameState.sessionId, onResolveMatch, isLoading]);
+
+    // Cleanup function - only run on unmount or session change
+  }, [gameState.flippedCard1, gameState.flippedCard2, gameState.board, gameState.sessionId, onResolveMatch, matchedCards]);
+
+  // Cleanup timer on unmount or session change
+  useEffect(() => {
+    return () => {
+      if (resolutionTimerRef.current) {
+        clearTimeout(resolutionTimerRef.current);
+        resolutionTimerRef.current = null;
+      }
+      isResolvingRef.current = false;
+    };
+  }, [gameState.sessionId]);
 
   const handleCardClick = async (cardIndex: number) => {
+    // Prevent clicks during loading, resolution, or if game ended
     if (isLoading || gameState.gameEnded || pendingResolution || localPendingResolution) return;
     // Don't allow clicking cards that are already matched
     if (matchedCards.has(cardIndex)) return;
     // Don't allow clicking cards that are currently flipped
     if (cardStates[cardIndex]?.isFlipped) return;
+    // Don't allow clicking if both cards are already flipped (waiting for resolution)
+    if (gameState.flippedCard1 !== 255 && gameState.flippedCard2 !== 255) return;
+    // Don't allow clicking the same card that's already flipped
+    if (cardIndex === gameState.flippedCard1 || cardIndex === gameState.flippedCard2) return;
 
     // Add animation
     setAnimatingCards(prev => new Set(prev).add(cardIndex));
 
     try {
       await onCardFlip(cardIndex);
+    } catch (error) {
+      console.error('Error flipping card:', error);
     } finally {
       // Remove animation after a short delay
       setTimeout(() => {
@@ -213,4 +287,5 @@ export const GameBoard = ({ gameState, onCardFlip, onResolveMatch, onStartNewGam
     </Card>
   );
 };
+
 

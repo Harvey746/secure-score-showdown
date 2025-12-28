@@ -249,19 +249,29 @@ export const useGameContract = () => {
       const receipt = await publicClient.waitForTransactionReceipt({ hash });
 
       if (receipt.status === 'success') {
+        // Small delay to ensure contract state is updated
+        await new Promise(resolve => setTimeout(resolve, 200));
         await refreshGameState();
+        // Additional delay to ensure state is fully propagated
+        await new Promise(resolve => setTimeout(resolve, 100));
       } else {
         throw new Error('Transaction failed');
       }
     } catch (err: any) {
+      console.error('Error in flipCard:', err);
       setError(err.message || 'Failed to flip card');
     } finally {
-      setIsLoading(false);
+      // Delay setting isLoading to false to ensure state updates are complete
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 100);
     }
   }, [address, walletClient, publicClient, getContract, refreshGameState]);
 
   const resolveMatch = useCallback(async () => {
+    console.log('resolveMatch called');
     if (!address || !walletClient || !publicClient) {
+      console.error('Wallet not connected in resolveMatch');
       setError('Wallet not connected');
       return;
     }
@@ -273,6 +283,7 @@ export const useGameContract = () => {
       const contract = getContract();
       if (!contract) throw new Error('Contract not available');
 
+      console.log('Simulating resolveMatch contract call...');
       const resolveResult = await publicClient.simulateContract({
         ...contract,
         functionName: 'resolveMatch',
@@ -280,17 +291,28 @@ export const useGameContract = () => {
         account: address,
       });
 
+      console.log('Writing resolveMatch transaction...');
       const hash = await walletClient.writeContract(resolveResult.request);
+      console.log('Waiting for resolveMatch transaction receipt...');
       await publicClient.waitForTransactionReceipt({ hash });
+      console.log('resolveMatch transaction confirmed');
 
-      // Small delay to ensure contract state is updated
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Longer delay to ensure contract state is fully updated
+      await new Promise(resolve => setTimeout(resolve, 300));
 
       // Refresh game state after resolution
+      console.log('Refreshing game state after resolveMatch...');
       await refreshGameState();
+      
+      // Refresh again after a bit more delay to ensure state is consistent
+      await new Promise(resolve => setTimeout(resolve, 200));
+      console.log('Second refresh after resolveMatch...');
+      await refreshGameState();
+      console.log('resolveMatch completed successfully');
     } catch (err: any) {
       console.error('Failed to resolve match:', err);
       setError(err.message || 'Failed to resolve match');
+      throw err; // Re-throw so caller knows it failed
     } finally {
       setIsLoading(false);
     }
